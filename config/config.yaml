@@ -1,0 +1,2 @@
+password_hasher:
+  cost: 10
