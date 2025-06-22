@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/go-playground/validator/v10"
+	"github.com/hinphansa/7-solutions-challenge/pkg/utils"
 	"gopkg.in/yaml.v3"
 
 	_ "embed"
@@ -15,6 +15,20 @@ type Config struct {
 		Cost int `yaml:"cost" validate:"required,min=1"`
 	} `yaml:"password_hasher"`
 
+	JWT struct {
+		Secret string `yaml:"secret" validate:"required,min=1"`
+		TTL    int    `yaml:"ttl" validate:"required,min=1"` // time to live in seconds
+	} `yaml:"jwt"`
+
+	Mongo struct {
+		URI string `yaml:"uri" validate:"required,min=1"`
+		DB  string `yaml:"db" validate:"required,min=1"`
+	} `yaml:"mongo"`
+
+	Server struct {
+		Port int `yaml:"port" validate:"required,min=1"`
+	} `yaml:"server"`
+
 	// TODO: add further configuration e.g. JWT secret, database connection string, etc.
 }
 
@@ -24,17 +38,7 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
-	if err := cfg.Validate(); err != nil {
-		return nil, err
-	}
-
+	// validate config with panic, if validation fails
+	utils.MustValid(&cfg)
 	return &cfg, nil
-}
-
-func (c *Config) Validate() error {
-	validator := validator.New()
-	if err := validator.Struct(c); err != nil {
-		return err
-	}
-	return nil
 }

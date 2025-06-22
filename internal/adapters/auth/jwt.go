@@ -16,7 +16,7 @@ func NewJWT(secret string, ttl time.Duration) *JWTMaker {
 	return &JWTMaker{secret: []byte(secret), ttl: ttl}
 }
 
-func (j *JWTMaker) NewToken(id bson.ObjectID, email string) (string, error) {
+func (j *JWTMaker) Generate(id bson.ObjectID, email string) (string, error) {
 	claims := jwt.MapClaims{
 		"sub": id.Hex(),
 		"eml": email,
