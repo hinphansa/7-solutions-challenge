@@ -1,0 +1,13 @@
+# ---------- build ----------
+FROM golang:1.24-alpine AS build
+WORKDIR /src
+COPY go.* ./
+RUN go mod download
+COPY . .
+RUN go build -o /http ./cmd/http
+
+# ---------- runtime ----------
+FROM alpine:3.20
+RUN apk add --no-cache ca-certificates
+COPY --from=build /http /http
+ENTRYPOINT ["/http"]

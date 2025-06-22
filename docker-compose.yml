@@ -16,7 +16,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
-  
+
   mongo-express:
     image: mongo-express
     restart: always
@@ -27,7 +27,7 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: false
-  
+
   mongo-migrate:
     build:
       context: .
@@ -41,11 +41,18 @@ services:
     restart: "no"
     entrypoint: ["/migrate"]
 
+  http:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.http
+    ports:
+      - 8080:8080
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: ["/http"]
+
 volumes:
   mongo_data:
     driver: local
-
-
-    
-
-    
