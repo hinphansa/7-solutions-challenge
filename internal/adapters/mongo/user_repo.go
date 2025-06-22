@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"errors"
 
 	"github.com/hinphansa/7-solutions-challenge/internal/domain"
 	"github.com/hinphansa/7-solutions-challenge/internal/ports"
@@ -21,7 +22,7 @@ type userRepository struct {
 	coll *mongo.Collection
 }
 
-func NewMongoRepository(db *mongo.Database) *userRepository {
+func NewUserRepository(db *mongo.Database) *userRepository {
 	return &userRepository{coll: db.Collection(collectionName)}
 }
 
@@ -51,7 +52,7 @@ func (r *userRepository) GetByID(ctx context.Context, id bson.ObjectID) (*domain
 }
 
 func (r *userRepository) GetAll(ctx context.Context) ([]domain.User, error) {
-	cursor, err := r.coll.Find(ctx, nil)
+	cursor, err := r.coll.Find(ctx, bson.D{{}})
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +68,7 @@ func (r *userRepository) GetAll(ctx context.Context) ([]domain.User, error) {
 func (r *userRepository) List(ctx context.Context, pagination *ports.Pagination) ([]domain.User, error) {
 	limit := pagination.Limit
 	skip := pagination.Offset * pagination.Limit
-	cursor, err := r.coll.Find(ctx, nil, options.Find().SetLimit(limit).SetSkip(skip))
+	cursor, err := r.coll.Find(ctx, bson.D{{}}, options.Find().SetLimit(limit).SetSkip(skip))
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +82,19 @@ func (r *userRepository) List(ctx context.Context, pagination *ports.Pagination)
 }
 
 func (r *userRepository) Update(ctx context.Context, id bson.ObjectID, user *domain.User) error {
-	_, err := r.coll.UpdateByID(ctx, id, bson.M{"$set": user})
+	updateFields := bson.M{}
+	if user.Email != "" {
+		updateFields["email"] = user.Email
+	}
+	if user.Name != "" {
+		updateFields["name"] = user.Name
+	}
+
+	if len(updateFields) == 0 {
+		return errors.New("no fields to update")
+	}
+
+	_, err := r.coll.UpdateByID(ctx, id, bson.M{"$set": updateFields})
 	return err
 }
 

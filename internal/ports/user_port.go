@@ -20,10 +20,14 @@ type UserRepository interface {
 
 type UserService interface {
 	Register(ctx context.Context, user *domain.User) (*bson.ObjectID, error)
-	Login(ctx context.Context, email string, password string) (string, error) // Authentication
 	GetByID(ctx context.Context, id bson.ObjectID) (*domain.User, error)
 	GetAll(ctx context.Context) ([]domain.User, error)
 	List(ctx context.Context, pagination *Pagination) ([]domain.User, error)
 	Update(ctx context.Context, id bson.ObjectID, user *domain.User) error
 	Delete(ctx context.Context, id bson.ObjectID) error
+	Count(ctx context.Context) (int64, error)
+}
+
+type AuthService interface {
+	Login(ctx context.Context, email string, password string) (string, error)
 }

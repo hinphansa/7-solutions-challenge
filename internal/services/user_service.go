@@ -12,7 +12,7 @@ import (
 )
 
 // Interface implementation check
-var _ ports.UserService = &service{}
+var _ ports.UserService = &usersvc{}
 
 var (
 	errUserNotFound          = errors.New("user not found")
@@ -31,22 +31,21 @@ type TokenGenerator interface {
 	Generate(id bson.ObjectID, email string) (string, error)
 }
 
-type service struct {
+type usersvc struct {
 	userRepo       ports.UserRepository
 	passwordHasher PasswordHasher
 	tokenGenerator TokenGenerator
 }
 
-func NewUserService(userRepo ports.UserRepository, passwordHasher PasswordHasher, tokenGenerator TokenGenerator) *service {
-	return &service{
+func NewUserService(userRepo ports.UserRepository, passwordHasher PasswordHasher, tokenGenerator TokenGenerator) *usersvc {
+	return &usersvc{
 		userRepo:       userRepo,
 		passwordHasher: passwordHasher,
 		tokenGenerator: tokenGenerator,
 	}
 }
 
-func (s *service) Register(ctx context.Context, user *domain.User) (*bson.ObjectID, error) {
-	// TODO: check email trimming and lowercasing, and validate email format
+func (s *usersvc) Register(ctx context.Context, user *domain.User) (*bson.ObjectID, error) {
 	user.Email = strings.ToLower(strings.TrimSpace(user.Email))
 	user.CreatedAt = time.Now()
 
@@ -63,26 +62,7 @@ func (s *service) Register(ctx context.Context, user *domain.User) (*bson.Object
 	return id, nil
 }
 
-func (s *service) Login(ctx context.Context, email string, password string) (string, error) {
-	user, err := s.userRepo.GetByEmail(ctx, email)
-	if err != nil {
-		return "", errUserNotFound
-	}
-
-	if err := s.passwordHasher.Compare(password, user.Password); err != nil {
-		return "", errInvalidPassword
-	}
-
-	token, err := s.tokenGenerator.Generate(user.ID, user.Email)
-	if err != nil {
-		return "", errUnableToGenerateToken
-	}
-
-	return token, nil
-}
-
-func (s *service) GetByID(ctx context.Context, id bson.ObjectID) (*domain.User, error) {
-	// TODO: check if password is not returned
+func (s *usersvc) GetByID(ctx context.Context, id bson.ObjectID) (*domain.User, error) {
 	user, err := s.userRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, errUserNotFound
@@ -90,22 +70,22 @@ func (s *service) GetByID(ctx context.Context, id bson.ObjectID) (*domain.User, 
 	return user, nil
 }
 
-func (s *service) GetAll(ctx context.Context) ([]domain.User, error) {
-	// TODO: check if password is not returned
+func (s *usersvc) GetAll(ctx context.Context) ([]domain.User, error) {
 	return s.userRepo.GetAll(ctx)
 }
 
-func (s *service) List(ctx context.Context, pagination *ports.Pagination) ([]domain.User, error) {
+func (s *usersvc) List(ctx context.Context, pagination *ports.Pagination) ([]domain.User, error) {
 	return s.userRepo.List(ctx, pagination)
 }
 
-func (s *service) Update(ctx context.Context, id bson.ObjectID, user *domain.User) error {
-	// TODO: and authorization check
-	// TODO: validate to allow only name or email to be updated
+func (s *usersvc) Update(ctx context.Context, id bson.ObjectID, user *domain.User) error {
 	return s.userRepo.Update(ctx, id, user)
 }
 
-func (s *service) Delete(ctx context.Context, id bson.ObjectID) error {
-	// TODO: and authorization check
+func (s *usersvc) Delete(ctx context.Context, id bson.ObjectID) error {
 	return s.userRepo.Delete(ctx, id)
+}
+
+func (s *usersvc) Count(ctx context.Context) (int64, error) {
+	return s.userRepo.Count(ctx)
 }
