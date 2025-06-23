@@ -130,7 +130,7 @@ func schedule(ctx context.Context, l logger.Logger, userService ports.UserServic
 				if err != nil {
 					l.Errorf("Failed to get all users: %v", err)
 				}
-				fmt.Println("Number of users in the DB:", len(users))
+				l.Infof("Number of users in the DB: %d", len(users))
 			}
 		}
 	}()
