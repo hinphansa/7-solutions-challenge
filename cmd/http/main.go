@@ -119,6 +119,7 @@ func main() {
 func schedule(ctx context.Context, l logger.Logger, userService ports.UserService, period time.Duration) {
 	ticker := time.NewTicker(period)
 	go func() {
+		defer ticker.Stop()
 		for {
 			select {
 			case <-ctx.Done():
@@ -133,6 +134,4 @@ func schedule(ctx context.Context, l logger.Logger, userService ports.UserServic
 			}
 		}
 	}()
-
-	ticker.Stop()
 }
