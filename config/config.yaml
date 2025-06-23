@@ -4,8 +4,11 @@ jwt:
   secret: "secret"
   ttl: 86400 # 24 hours
 mongo:
-  uri: mongodb://root:example@localhost:27017
-  # uri: mongodb://root:example@mongo:27017
+  # localhost mongodb
+  # uri: mongodb://root:example@localhost:27017
+
+  # docker compose mongodb
+  uri: mongodb://root:example@mongo:27017
   db: 7-solutions-challenge
 server:
   port: 8080
