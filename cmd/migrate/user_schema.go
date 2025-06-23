@@ -8,7 +8,7 @@ import (
 
 // userSchema converts the Go-struct schema into Mongo-flavoured JSON-Schema.
 func userSchema() bson.M {
-	emailRe := regexp.MustCompile(`^[\w\-.]+@([\w\-]+\.)+[\w\-]{2,4}$`)
+	emailRegexp := regexp.MustCompile(`^[\w\-.]+@([\w\-]+\.)+[\w\-]{2,4}$`)
 	schema := bson.M{
 		"bsonType": "object",
 		"required": []string{"name", "email", "password", "created_at"},
@@ -20,7 +20,7 @@ func userSchema() bson.M {
 			},
 			"email": bson.M{
 				"bsonType":    "string",
-				"pattern":     emailRe.String(),
+				"pattern":     emailRegexp.String(),
 				"description": "valid e-mail",
 			},
 			"password": bson.M{
