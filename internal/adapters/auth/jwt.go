@@ -24,3 +24,18 @@ func (j *JWTMaker) Generate(id bson.ObjectID, email string) (string, error) {
 	}
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(j.secret)
 }
+
+func (j *JWTMaker) Verify(token string) (bson.ObjectID, bool, error) {
+	claims := jwt.MapClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (any, error) {
+		return j.secret, nil
+	})
+	if err != nil {
+		return bson.ObjectID{}, false, err
+	}
+	id, err := bson.ObjectIDFromHex(claims["sub"].(string))
+	if err != nil {
+		return bson.ObjectID{}, false, err
+	}
+	return id, true, nil
+}
