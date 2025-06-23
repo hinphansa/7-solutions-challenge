@@ -27,6 +27,9 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: false
+    depends_on:
+      mongo:
+        condition: service_healthy
 
   mongo-migrate:
     build:
@@ -52,6 +55,17 @@ services:
         condition: service_healthy
     restart: "no"
     entrypoint: ["/http"]
+
+  grpc:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.grpc
+    ports:
+      - "50051:50051"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://root:example@mongo:27017
 
 volumes:
   mongo_data:
