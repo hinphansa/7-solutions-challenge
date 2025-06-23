@@ -3,6 +3,10 @@ password_hasher:
 jwt:
   secret: "secret"
   ttl: 86400 # 24 hours
+http_server:
+  port: 8080
+grpc_server:
+  port: 50051
 mongo:
   # localhost mongodb
   # uri: mongodb://root:example@localhost:27017
@@ -10,5 +14,3 @@ mongo:
   # docker compose mongodb
   uri: mongodb://root:example@mongo:27017
   db: 7-solutions-challenge
-server:
-  port: 8080

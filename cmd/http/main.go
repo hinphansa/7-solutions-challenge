@@ -81,7 +81,7 @@ func main() {
 	http.SetupRoutes(app, cfg, userHandler, authHandler)
 
 	go func() {
-		if err := app.Listen(fmt.Sprintf(":%d", cfg.Server.Port)); err != nil {
+		if err := app.Listen(fmt.Sprintf(":%d", cfg.HttpServer.Port)); err != nil {
 			l.Fatalf("Failed to start server: %v", err)
 		}
 	}()

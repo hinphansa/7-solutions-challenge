@@ -25,11 +25,13 @@ type Config struct {
 		DB  string `yaml:"db" validate:"required,min=1"`
 	} `yaml:"mongo"`
 
-	Server struct {
+	HttpServer struct {
 		Port int `yaml:"port" validate:"required,min=1"`
-	} `yaml:"server"`
+	} `yaml:"http_server"`
 
-	// TODO: add further configuration e.g. JWT secret, database connection string, etc.
+	GrpcServer struct {
+		Port int `yaml:"port"`
+	} `yaml:"grpc_server"`
 }
 
 func Load() (*Config, error) {
